@@ -1,5 +1,6 @@
 from selenium import webdriver
 from time import sleep
+from screen.index import Screen_logger
 from logger.index import log_to_json,get_time_format,get_cwd
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -19,7 +20,7 @@ def init_config():
 class auto_comment:
     url:'https://www.xiaohongshu.com/notification'
     #截图保存目录
-    screen_path ='/screen/'
+
     # browers 驱动实例
     browers=None
     #启动状态
@@ -28,6 +29,8 @@ class auto_comment:
     login_state=False
     # 工作状态
     working_state=False
+    # 屏幕功能注入
+    screen_carema=None
 
     def __init__(self):
         self._init()
@@ -40,18 +43,19 @@ class auto_comment:
         browers.get('https://www.xiaohongshu.com/notification')
         self.browers = browers
         self.init_state = True
-    
+        self.screen_carema = Screen_logger(browers)
     # 抹除webdriver信息
     def _wipe_driver(self,browers):
             browers.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument",{
             "source":""" Object.defineProperty(navigator,'webdriver',{get:()=>undefined})"""
         })
     # 截屏
+    @log_to_json
     def screenshot(self):
-        path =get_cwd() +  self.screen_path + get_time_format() + '.png'
-        self.browers.save_screenshot(path)
-        print(f"窗口快照已保存到 {path}")
+        return self.screen_carema.screenshot()
 
 if __name__ == '__main__':
     driver = auto_comment()
-    driver.screenshot()
+
+    # 测试屏幕
+    screen = Screen_logger()

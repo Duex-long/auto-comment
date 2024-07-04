@@ -1,4 +1,7 @@
 from selenium import webdriver
+from selenium.webdriver.common.by import By
+
+
 from time import sleep
 from screen.index import Screen_logger
 from logger.index import log_to_json,get_time_format,get_cwd
@@ -99,11 +102,15 @@ class auto_comment:
     def screenshot(self):
         return self.screen_carema.screenshot()
     # 获取元素 
-    def getElementByClass(self,css):
-         target = self.browers.find_element_by_class_name(css)
-         return target
+    def getElementByClass(self,css,parent=None):
+        
+        if not parent:
+            parent = self.browers
+        target = parent.find_element(by=By.CLASS_NAME,value=css)
+        print('查找css',css,parent)
+        return target
     def getElementById(self,id):
-         target = self.browers.find_element_by_id(id)
+         target = self.browers.find_element(by=By.ID,value=id)
          return target
 if __name__ == '__main__':
     driver = auto_comment(XHSMedia)

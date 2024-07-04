@@ -18,11 +18,7 @@ class Media(metaclass=ABCMeta):
     @abstractmethod
     def login(self):
         pass
-    # 前往目标地址
+    # 前往目标地址 并且评论
     @abstractmethod
     def lock_target(self):
-        pass
-    # 添加评论
-    @abstractmethod
-    def append_comment(self):
         pass

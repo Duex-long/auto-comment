@@ -33,6 +33,7 @@ class Mail_Helper:
             self.message.attach(part)
     def header_builder(self,receiver,subject):
         message = self.message
+        message['From'] = Header('x <mail>')
         message['To'] = receiver
         message['Subject'] = subject
     def send_mail(self,receiver):
@@ -41,7 +42,9 @@ class Mail_Helper:
         smtper = SMTP('smtp.qq.com',587)
         # 开启安全连接
         # smtper.starttls()
+        sender = 'user'
         receiver = receiver
+        smtper.login(sender, 'key')
         # 发送邮件
         smtper.sendmail(sender, receiver, self.message.as_string())
         # 与邮件服务器断开连接

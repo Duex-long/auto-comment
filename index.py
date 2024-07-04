@@ -55,11 +55,15 @@ class auto_comment:
          # 加载截图功能
         self.screen_carema = Screen_logger(browers)
         # 预检
-        self.init_state = self._pre_check()
+        # self.init_state = self._pre_check()
+        self.init_state = True
         # 加载社交平台
         self._load_media()
-        # 打开平台
-        self.media.open_index()
+        if self.init_state:
+          # 打开平台
+          self.media.open_index()
+        else:
+            console.error('启动失败')
     # 抹除webdriver信息
     def _wipe_driver(self):
         # 修改属性
@@ -75,7 +79,7 @@ class auto_comment:
     def _pre_check(self):
          # 预检
         self.browers.get('https://bot.sannysoft.com/')
-        self.browers.implicitly_wait(10)
+        self.browers.implicitly_wait(20)
         element = self.browers.find_element_by_id('webdriver-result')
         state_text = element.text
         if('missing' in state_text):
@@ -84,19 +88,23 @@ class auto_comment:
         else:
             console.error('预检失败')
             return False
-
     # 加载js
     def _inject_js_code(self,code):
         self.browers.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                     "source": code
         })
     def _load_media(self):
-        self.media =self.mediaFactory(self.browers)
-    
+        self.media =self.mediaFactory(self)
     # 截屏
     def screenshot(self):
-        file_path = self.screen_carema.screenshot()
-
+        return self.screen_carema.screenshot()
+    # 获取元素 
+    def getElementByClass(self,css):
+         target = self.browers.find_element_by_class_name(css)
+         return target
+    def getElementById(self,id):
+         target = self.browers.find_element_by_id(id)
+         return target
 if __name__ == '__main__':
     driver = auto_comment(XHSMedia)
 

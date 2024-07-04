@@ -50,7 +50,7 @@ class Logger():
         self._check_file(name)
 
     def _hash_file_name(self,name):
-        return self.path + name +  get_time_format() +'-logger.json'
+        return self.path + name +'logger.json'
 
     def _check_file(self,name=''):
         full_path_name = self._hash_file_name(name)

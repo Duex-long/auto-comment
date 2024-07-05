@@ -10,14 +10,18 @@ log_path = get_cwd() + '/record/'
 record = Logger(log_path)
 # 邮件接收者
 receiver = '852040420@qq.com'
+# 页面加载等待
+PAGE_INIT_WAIT = 10
+# SPA等待
+PAGE_SPA_WAIT = 3
+#基本操作等待
+PAGE_EVENT_WAIT = 1
 # 等待时间
 polling_seconds = 10
 # 暂停最小随机
-disguise_min = 10
+disguise_min = 1
 # 暂停最大随机
-disguise_max = 50
-
-
+disguise_max = 6
 
 #example
     # 方法1
@@ -35,45 +39,47 @@ disguise_max = 50
 
 
 
-print(target_list,'target_list')
 mail = Mail_Helper()
 class XHSMedia(Media):
+    _login_mark = 0
     _url = 'https://www.xiaohongshu.com/notification'
     def __init__(self,bower):
         super().__init__(bower)
         self._name = 'xhs'
     def open(self,url):
         self._bower.browers.get(url) 
-        self._bower.browers.implicitly_wait(10)
+        self._bower.browers.implicitly_wait(PAGE_INIT_WAIT)
     def open_index(self):
         print('启动')
         self._bower.browers.get(self._url)    
-        self._bower.browers.implicitly_wait(10)
+        self._bower.browers.implicitly_wait(PAGE_INIT_WAIT)
         # 等待小红书未登录弹窗
-        sleep(4)
+        # sleep(PAGE_SPA_WAIT)
         # 检查登陆
-        # self.check_login() 
+        self.check_login()  
         # 模拟用户
         self.disguise()
-        
         return True
-   
-    def check_login(self):
+    
+    def check_login(self,send=True):
         # 检查login容器
         try:
             login_container = self._bower.getElementByClass('login-container')
             if login_container:
                 # 未登录的情况下进行屏幕快照
                 print(login_container,'登录容器')
-                login_screen = self._bower.screenshot()
-                print(login_screen,'截图')
-                mail.file_builder(login_screen,'查看内容.png')
-                mail.header_builder('852040420@qq.com','需要扫马儿')
-                mail.message_builder('附件中有内容')
-                mail.send_mail(receiver)
-                sleep(polling_seconds)
+                if send:
+                    login_screen = self._bower.screenshot()
+                    print(login_screen,'截图')
+                    mail.file_builder(login_screen,'查看内容.png')
+                    mail.header_builder('852040420@qq.com','需要扫马儿')
+                    mail.message_builder('附件中有内容')
+                    mail.send_mail(receiver)
+                    sleep(polling_seconds)
                 # 轮询
-                self.check_login()
+                self._login_mark +=1
+                need_send = bool(self._login_mark % 4)
+                self.check_login(need_send)
         except:
             print('登陆成功')
             return True
@@ -84,7 +90,7 @@ class XHSMedia(Media):
         self.open(url)
         record_data = {}
         # spa 需要等待页面load
-        sleep(3)
+        sleep(PAGE_SPA_WAIT)
         comment_result = None
         try:
             # 获取输入框元素的container（会有重名样式 所以必须逐步缩小范围）
@@ -100,7 +106,7 @@ class XHSMedia(Media):
             # 因enter按键同样被绑定发送事件，模拟键盘
             insert_element.send_keys(Keys.RETURN)
             # 等待3s接口/页面响应
-            sleep(3)
+            sleep(PAGE_SPA_WAIT)
             # 截图
             comment_screen = self._bower.screenshot()
             # 记录数据
@@ -120,6 +126,7 @@ class XHSMedia(Media):
             record.append_data(record_data)
         except Exception as record_err:
             print('record失败')
+        self._bower.window_scroll_by_Y(random.randint(300,800))
         return comment_result
     def disguise(self):
         # 回首页
@@ -129,9 +136,16 @@ class XHSMedia(Media):
             home_button.click()
         else:
             self.open(self._url)
-        sleep(2)
+        sleep(PAGE_EVENT_WAIT)
+        # 获取模拟次数
         scroll_num = random.randint(disguise_min,disguise_max)
-        self._bower.window_scroll_by_Y(300)
+        # 根据 scroll_num 次数 模拟操作 滚动 点击 红心
+        for i in range(scroll_num):
+            self._bower.window_scroll_by_Y(random.randint(300,800))
+            # 每次做完操作稳定一下
+            sleep(PAGE_SPA_WAIT)
+        
+        sleep(PAGE_SPA_WAIT)
 
         
 

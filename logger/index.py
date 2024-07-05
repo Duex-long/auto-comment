@@ -13,14 +13,16 @@ def log_to_json(func):
     # 装饰函数
     @wraps(func)
     def wrapper(*args,**kwargs):
+        result = func(*args,**kwargs)
         log_data = {
             'function': func.__name__,
             'args': args[1:],  # 跳过 'self'
             'kwargs': kwargs,
-            'timestamp':get_time_format()
+            'timestamp':get_time_format(),
+            'result':result
         }
         logger.append_data(log_data)
-        result = func(*args,**kwargs)
+
         return result
     return wrapper
 def check_dir(path):

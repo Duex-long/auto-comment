@@ -96,22 +96,33 @@ class auto_comment:
         self.browers.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
                     "source": code
         })
+    # 运行时执行js
+    def execute_js_code(self,code):
+        self.browers.execute_script(code)
+    def window_scroll_by_Y(self,num=300):
+        self.execute_js_code(f'"window.scrollBy({top:{num},behavior:\\"smooth\\"}"')
     def _load_media(self):
         self.media =self.mediaFactory(self)
     # 截屏
     def screenshot(self):
         return self.screen_carema.screenshot()
-    # 获取元素 
+    # 获取元素 class 
     def getElementByClass(self,css,parent=None):
-        
-        if not parent:
-            parent = self.browers
-        target = parent.find_element(by=By.CLASS_NAME,value=css)
-        print('查找css',css,parent)
-        return target
+        try:      
+            if not parent:
+                parent = self.browers
+            target = parent.find_element(by=By.CLASS_NAME,value=css)
+            print('查找css',css,parent)
+            return target
+        except Exception as e:
+            return None
+    # 获取元素 id
     def getElementById(self,id):
-         target = self.browers.find_element(by=By.ID,value=id)
-         return target
+        try:
+            target = self.browers.find_element(by=By.ID,value=id)
+            return target
+        except Exception as e:
+            return None
 if __name__ == '__main__':
     driver = auto_comment(XHSMedia)
 

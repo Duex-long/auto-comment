@@ -100,7 +100,7 @@ class auto_comment:
     def execute_js_code(self,code):
         self.browers.execute_script(code)
     def window_scroll_by_Y(self,num=300):
-        self.execute_js_code(f'"window.scrollBy({top:{num},behavior:\\"smooth\\"}"')
+        self.execute_js_code(f'window.scrollBy({{"top": {num}, "behavior": "smooth"}})')
     def _load_media(self):
         self.media =self.mediaFactory(self)
     # 截屏
@@ -123,8 +123,8 @@ class auto_comment:
             return target
         except Exception as e:
             return None
-if __name__ == '__main__':
-    driver = auto_comment(XHSMedia)
+# if __name__ == '__main__':
+    # driver = auto_comment(XHSMedia)
 
     # 测试初始化
     # screen = Screen_logger()

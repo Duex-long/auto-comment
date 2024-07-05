@@ -49,6 +49,7 @@ class Logger():
     full_path_name=''
     def __init__(self,path,name=''):
         self.path = path
+        create_dir(path,name)
         self._check_file(name)
 
     def _hash_file_name(self,name):
